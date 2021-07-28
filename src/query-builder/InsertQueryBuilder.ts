@@ -288,12 +288,13 @@ export class InsertQueryBuilder<Entity> extends QueryBuilder<Entity> {
     /**
      * Adds additional update statement supported in databases.
      */
-    orUpdate(statementOrOverwrite?: { columns?: string[], overwrite?: string[], conflict_target?: string | string[] } | string[], conflictTarget?: string | string[]): this {
+    orUpdate(statementOrOverwrite?: { columns?: string[], overwrite?: string[], conflict_target?: string | string[], rawOverwrite?: {name: string, value: string} } | string[], conflictTarget?: string | string[]): this {
         if (!Array.isArray(statementOrOverwrite)) {
             this.expressionMap.onUpdate = {
                 conflict: statementOrOverwrite?.conflict_target,
                 columns: statementOrOverwrite?.columns,
                 overwrite: statementOrOverwrite?.overwrite,
+                rawOverwrite: statementOrOverwrite?.rawOverwrite,
             };
             return this;
         }
