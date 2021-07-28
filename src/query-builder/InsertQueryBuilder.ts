@@ -382,15 +382,22 @@ export class InsertQueryBuilder<Entity> extends QueryBuilder<Entity> {
 
         if (this.connection.driver instanceof MysqlDriver || this.connection.driver instanceof AuroraDataApiDriver) {
             if (this.expressionMap.onUpdate) {
-                const { overwrite, columns } = this.expressionMap.onUpdate;
-
+                const { overwrite, columns, rawOverwrite } = this.expressionMap.onUpdate;
                 if (Array.isArray(overwrite)) {
                     query += " ON DUPLICATE KEY UPDATE ";
-                    query += overwrite.map(column => `${this.escape(column)} = VALUES(${this.escape(column)})`).join(", ");
+                    query += overwrite.map(column => {
+                        return `${this.escape(column)} = VALUES(${this.escape(column)})`;
+                    }).join(", ");
                     query += " ";
                 } else if (Array.isArray(columns)) {
                     query += " ON DUPLICATE KEY UPDATE ";
                     query += columns.map(column => `${this.escape(column)} = :${column}`).join(", ");
+                    query += " ";
+                } else if (Array.isArray(rawOverwrite)) {
+                    query += " ON DUPLICATE KEY UPDATE ";
+                    query += rawOverwrite.map(column => {
+                        return `${this.escape(column.name)} = ${(column.value)}`;
+                    }).join(", ");
                     query += " ";
                 }
             }
